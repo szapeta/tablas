@@ -7,7 +7,7 @@ function App() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [selectedTable, setSelectedTable] = useState(null);
-  const [ordered, setOrdered] = useState(false);
+  const [ordered, setOrdered] = useState(true);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-100 p-4">
