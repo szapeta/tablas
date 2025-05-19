@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-function PracticeScreen({ name, table, onRestart, onBackToStart }) {
+function PracticeScreen({ name, table, ordered, onRestart, onBackToStart }) {
   const [question, setQuestion] = useState({ n: 1, options: [] });
   const [correctCount, setCorrectCount] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60); // 1:20 minutos 80
+  const [timeLeft, setTimeLeft] = useState(120);
   const [ended, setEnded] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isCorrect, setIsCorrect] = useState(null);
+  const [sequenceIndex, setSequenceIndex] = useState(1);
 
   useEffect(() => {
-    generateQuestion();
+    generateQuestion(1);
   }, []);
 
   useEffect(() => {
@@ -21,22 +22,25 @@ function PracticeScreen({ name, table, onRestart, onBackToStart }) {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  const generateQuestion = () => {
-    setQuestion((prevQuestion) => {
-      let newN;
+  const generateQuestion = (nextIndex = sequenceIndex) => {
+    let newN;
+    if (ordered) {
+      newN = nextIndex > 10 ? 1 : nextIndex;
+    } else {
       do {
         newN = Math.floor(Math.random() * 10) + 1;
-      } while (newN === prevQuestion.n);
+      } while (newN === question.n);
+    }
 
-      const correct = newN * table;
-      const options = [correct];
-      while (options.length < 3) {
-        const fake = correct + Math.floor(Math.random() * 10 - 5);
-        if (!options.includes(fake) && fake > 0) options.push(fake);
-      }
+    const correct = newN * table;
+    const options = [correct];
+    while (options.length < 3) {
+      const fake = correct + Math.floor(Math.random() * 10 - 5);
+      if (!options.includes(fake) && fake > 0) options.push(fake);
+    }
 
-      return { n: newN, options: shuffle(options) };
-    });
+    setQuestion({ n: newN, options: shuffle(options) });
+    if (ordered) setSequenceIndex(newN + 1);
   };
 
   const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
@@ -73,8 +77,8 @@ function PracticeScreen({ name, table, onRestart, onBackToStart }) {
                 ${
                   selectedOption === opt
                     ? isCorrect
-                      ? "shadow-[0_0_10px_3px_rgba(34,197,94,0.7)]"  // verde
-                      : "shadow-[0_0_10px_3px_rgba(239,68,68,0.7)]" // rojo
+                      ? "shadow-[0_0_16px_6px_rgba(34,197,94,0.7)]"
+                      : "shadow-[0_0_16px_6px_rgba(239,68,68,0.7)]"
                     : ""
                 }`}
                 onClick={() => checkAnswer(opt)}
@@ -89,7 +93,7 @@ function PracticeScreen({ name, table, onRestart, onBackToStart }) {
         </>
       ) : (
         <>
-          <h2 className="text-sm">tabla del {table}</h2>
+          <h2 className="text-sm">Tabla del {table}</h2>
           <h2 className="text-xl font-bold">¡Tiempo terminado!</h2>
           <p className="mt-4 font-semibold text-green-600 text-lg animate-pulseOnce">
             Respuestas correctas: {correctCount}
