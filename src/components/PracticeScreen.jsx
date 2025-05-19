@@ -22,18 +22,21 @@ function PracticeScreen({ name, table, onRestart, onBackToStart }) {
   }, [timeLeft]);
 
   const generateQuestion = () => {
-    let newN;
-    do {
-      newN = Math.floor(Math.random() * 10) + 1;
-    } while (newN === question.n);
+    setQuestion((prevQuestion) => {
+      let newN;
+      do {
+        newN = Math.floor(Math.random() * 10) + 1;
+      } while (newN === prevQuestion.n);
 
-    const correct = newN * table;
-    const options = [correct];
-    while (options.length < 3) {
-      const fake = correct + Math.floor(Math.random() * 10 - 5);
-      if (!options.includes(fake) && fake > 0) options.push(fake);
-    }
-    setQuestion({ n: newN, options: shuffle(options) });
+      const correct = newN * table;
+      const options = [correct];
+      while (options.length < 3) {
+        const fake = correct + Math.floor(Math.random() * 10 - 5);
+        if (!options.includes(fake) && fake > 0) options.push(fake);
+      }
+
+      return { n: newN, options: shuffle(options) };
+    });
   };
 
   const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
