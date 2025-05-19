@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
 
 function PracticeScreen({ name, table, ordered, onRestart, onBackToStart }) {
   const [question, setQuestion] = useState({ n: 1, options: [] });
@@ -66,26 +68,37 @@ function PracticeScreen({ name, table, ordered, onRestart, onBackToStart }) {
       {!ended ? (
         <>
           <h2 className="text-xl font-bold mb-2">Hola {name}</h2>
-          <h3 className="text-lg mb-4">
+          <motion.h3
+            className="text-lg mb-4"
+            key={question.n}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             ¿Cuánto es {table} × {question.n}?
-          </h3>
+          </motion.h3>
+
           <div className="flex flex-row justify-center gap-4 mb-6">
             {question.options.map((opt, i) => (
-              <button
+              <motion.button
                 key={i}
-                className={`bg-yellow-400 px-6 py-4 text-xl rounded-lg hover:bg-yellow-300 transition-all duration-300
-                ${
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={
                   selectedOption === opt
                     ? isCorrect
-                      ? "shadow-[0_0_16px_6px_rgba(34,197,94,0.7)]"
-                      : "shadow-[0_0_16px_6px_rgba(239,68,68,0.7)]"
-                    : ""
-                }`}
+                      ? { scale: [1, 1.1, 1], boxShadow: "0 0 16px 6px rgba(34,197,94,0.7)" }
+                      : { x: [0, -5, 5, -5, 5, 0], boxShadow: "0 0 16px 6px rgba(239,68,68,0.7)" }
+                    : {}
+                }
+                transition={{ duration: 0.4 }}
+                className="bg-yellow-400 px-6 py-4 text-xl rounded-lg hover:bg-yellow-300"
                 onClick={() => checkAnswer(opt)}
                 disabled={selectedOption !== null}
               >
                 {opt}
-              </button>
+              </motion.button>
+
             ))}
           </div>
           <p className="text-sm">Tiempo restante: {timeLeft}s</p>
@@ -94,10 +107,24 @@ function PracticeScreen({ name, table, ordered, onRestart, onBackToStart }) {
       ) : (
         <>
           <h2 className="text-sm">Tabla del {table}</h2>
-          <h2 className="text-xl font-bold">¡Tiempo terminado!</h2>
-          <p className="mt-4 font-semibold text-green-600 text-lg animate-pulseOnce">
+          <motion.h2
+            className="text-xl font-bold text-pink-600"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 100 }}
+          >
+          ¡Tiempo terminado!
+          </motion.h2>
+
+          <motion.p
+            className="mt-4 font-semibold text-green-600 text-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
             Respuestas correctas: {correctCount}
-          </p>
+          </motion.p>
+
           <div className="flex justify-center gap-4 mt-6">
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
